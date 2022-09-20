@@ -28,7 +28,7 @@ If release name contains chart name it will be used as a full name.
 Create chart name and version as used by the chart label.
 */}}
 {{- define "trickster.chart" -}}
-{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
+{{- regexReplaceAll "\\W+" (printf "%s-%s" .Chart.Name .Chart.Version) "_" | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/* Generate basic labels */}}
@@ -38,8 +38,8 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 app.kubernetes.io/name: {{ template "trickster.name" . }}
 app.kubernetes.io/part-of: {{ template "trickster.name" . }} 
-app.kubernetes.io/version: "{{ .Chart.Version }}"
-helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }} 
+app.kubernetes.io/version: "{{  regexReplaceAll "\\W+" .Chart.Version "_" }}"
+helm.sh/chart: {{ .Chart.Name }}-{{  regexReplaceAll "\\W+" .Chart.Version "_" }}
 tricksterproxy.io/version: "{{ .Chart.AppVersion }}"
 {{- if .Values.customLabels }}
 {{ toYaml .Values.customLabels | indent 4 }}
